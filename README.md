@@ -44,16 +44,53 @@ Sinyal değişmediği sürece **uyuyan**, bir olay gelince kendini uyandırıp d
 
 ## 🧱 Sistemin parçaları
 
-Her blok önce tek başına doğrulandı, sonra bir üst seviyeye eklendi. (Tasarım detayları paylaşılmıyor, sadece ne yaptıkları ve sonuçları.)
+Her blok önce tek başına doğrulandı, sonra bir üst seviyeye eklendi. Tasarım detayları paylaşılmıyor, sadece ne yaptıkları ve sonuçları.
 
-| Blok | Görevi | Sonuç |
-|---|---|---|
-| **Komparatör** | Kapasite dizisinin çıkışını referansla karşılaştırır, kararı verince READY üretir | Rail-to-rail (30 … 1790 mV), ofset σ 1,6 – 2,8 mV, karar 2,4 – 4,1 ns, layout + DRC/LVS temiz |
-| **CDAC (kapasite DAC'ı)** | Örneklenen girişi tutar, her adımda bir biti dener | 9 bit + dummy dizisi el ile sürülen SAR testinde doğru kodu veriyor; hata **< 0,1 LSB**, en kötü bit oturması **24 ns** |
-| **Örnekleme anahtarı** | Girişi kapasitelere alır | Direnci giriş geriliminden bağımsız (bootstrap), raydan raya giriş |
-| **Analog anahtarlar** | Kapasite plakalarını referanslara bağlar | 2 pF yükte 10 bit yarım-LSB'ye 43 ns'de oturma |
-| **Ortak mod referansı (VDD/2)** | Karşılaştırma noktasını üretir | 0,900 V, ~20 nA; örnekleme anında sadece 20 µV çökme |
-| **SAR mantığı + sıralayıcı** | Bitleri yazar, komparatörü tetikler ve durdurur | Tek START ile 10 bit, 123 ns; erken durma, pencere kontrolü ve zaman aşımı koruması |
+### 🎚️ Komparatör
+Kapasite dizisinin çıkışını referansla karşılaştırır, kararı verince kendi READY sinyalini üretir.
+
+| Metrik | Sonuç |
+|---|---|
+| Giriş ortak modu | **Rail-to-rail**, 30 … 1790 mV |
+| Ofset (layout, Monte Carlo) | **σ 1,6 – 2,8 mV**, kalibrasyonsuz |
+| Karar süresi | 2,4 – 4,1 ns |
+| Doğrulama | Layout, DRC/LVS temiz; çıkarılmış layout'ta 720/720 doğru karar (±1 mV, tüm köşeler) |
+
+### 🧮 CDAC (kapasite DAC'ı)
+Örneklenen girişi tutar ve her adımda bir biti dener; SAR'ın "terazisi".
+
+| Metrik | Sonuç |
+|---|---|
+| Yapı | 9 bit ikili ağırlıklı dizi + dummy |
+| Doğruluk | El ile sürülen SAR testinde doğru kod; en büyük hata **0,34 mV (< 0,1 LSB)** |
+| En kötü bit oturması | **24 ns** (0,25 LSB'ye) |
+| İyileştirme | Parazitik kaynaklı %1,4 kazanç hatası tespit edilip 10 kat düşürüldü |
+
+### 🔌 Örnekleme ve analog anahtarlar
+Girişi kapasitelere alır, plakaları referanslara bağlar.
+
+| Metrik | Sonuç |
+|---|---|
+| Örnekleme anahtarı | Bootstrap: direnci giriş geriliminden bağımsız, raydan raya giriş |
+| Plaka anahtarları | 2 pF yükte 10 bit yarım-LSB'ye 43 ns'de oturma |
+
+### 📍 Ortak mod referansı (VDD/2)
+Karşılaştırma noktasını üretir; tamamen pasif ve çok düşük akımlı.
+
+| Metrik | Sonuç |
+|---|---|
+| Çıkış | **0,900 V** (VDD/2, beslemeyle oransal) |
+| Akım / güç | ~20 nA / ~36 nW |
+| Örnekleme anında çökme | sadece **20 µV** |
+
+### 🧠 SAR mantığı ve sıralayıcı
+Bitleri yazar, komparatörü tetikler ve durdurur; saati kendisi üretir.
+
+| Metrik | Sonuç |
+|---|---|
+| Dönüşüm | Tek START darbesiyle 10 bit, **123 ns** |
+| Modlar | Erken durma (6 bit, 26 pJ), tek kararlık pencere kontrolü (9,7 pJ) |
+| Güvenlik | Zaman aşımı koruması, iş bitince kendiliğinden uykuya dönüş |
 
 ## 🏁 Literatürde neredeyiz?
 
