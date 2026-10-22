@@ -65,6 +65,8 @@ Kapasite dizisinin çıkışını referansla karşılaştırır, kararı verince
 | Doğruluk | El ile sürülen SAR testinde doğru kod; en büyük hata **0,34 mV (< 0,1 LSB)** |
 | En kötü bit oturması | **24 ns** (0,25 LSB'ye) |
 | İyileştirme | Parazitik kaynaklı %1,4 kazanç hatası tespit edilip 10 kat düşürüldü |
+| Layout | 16×32 2D ortak merkezli dizi, 512 aktif + 100 dummy birim, **DRC 0** |
+| Layout (RC çıkarımlı) | Doğru kod; kazanç 0,984, **INL en kötü 0,07 LSB**, en kötü oturma **12 ns** |
 
 ### 🔌 Örnekleme ve analog anahtarlar
 Girişi kapasitelere alır, plakaları referanslara bağlar.
@@ -72,7 +74,8 @@ Girişi kapasitelere alır, plakaları referanslara bağlar.
 | Metrik | Sonuç |
 |---|---|
 | Örnekleme anahtarı | Bootstrap: direnci giriş geriliminden bağımsız, raydan raya giriş |
-| Plaka anahtarları | 2 pF yükte 10 bit yarım-LSB'ye 43 ns'de oturma |
+| Plaka anahtarları (v1) | 2 pF yükte 10 bit yarım-LSB'ye 43 ns'de oturma; layout DRC/LVS temiz, layout = şema |
+| Plaka anahtarları (v2, düşük eşikli) | Oturma **13,6 ns** (3 kat hızlı), kapalı kaçak en kötü **0,31 nA** |
 
 ### 📍 Ortak mod referansı (VDD/2)
 Karşılaştırma noktasını üretir; tamamen pasif ve çok düşük akımlı.
@@ -91,6 +94,26 @@ Bitleri yazar, komparatörü tetikler ve durdurur; saati kendisi üretir.
 | Dönüşüm | Tek START darbesiyle 10 bit, **123 ns** |
 | Modlar | Erken durma (6 bit, 26 pJ), tek kararlık pencere kontrolü (9,7 pJ) |
 | Güvenlik | Zaman aşımı koruması, iş bitince kendiliğinden uykuya dönüş |
+
+## 🆕 Son güncellemeler (Ekim 2026)
+
+**🧮 CDAC layout'u çizildi**
+- 9 bit, sky130 MIM birim kapasite ~9,3 fF, toplam ~4,76 pF, ikili ölçekli sürücüler
+- 16×32 2D ortak merkezli yerleşim, 512 aktif + 100 dummy birim, **DRC 0**
+- RC çıkarımlı layout testi: 30 mV girişte doğru kod, kazanç 0,984, **INL en kötü 0,07 LSB**, en kötü bit oturması **12 ns**
+
+**🔌 Analog anahtar (T-gate)**
+- v1: layout DRC 0, LVS eş; layout sonucu şemayla aynı (2 pF'a 42,6 ns oturma)
+- v2 (düşük eşikli): oturma **13,6 ns**; tepe açık direnç tt/ss/ff **1,6k / 2,4k / 1,2k Ω** (v1: 5,2k / 15,8k / 2,2k Ω); kapalı kaçak en kötü **0,31 nA**
+
+| Anahtar | Oturma (2 pF) | Tepe Ron tt / ss / ff | Layout |
+|---|---|---|---|
+| v1 | 42,6 ns | 5,2k / 15,8k / 2,2k Ω | DRC 0, LVS eş |
+| **v2 (LVT)** | **13,6 ns** | **1,6k / 2,4k / 1,2k Ω** | DRC 0, LVS eş |
+
+**📍 Ortak mod referansı:** köşelerde **0,900 V**, ~20 nA, boşta **36 nW** (25 °C)
+
+**🔧 Masaüstü demo (yolda):** 8 bit R-2R SAR + örnekle-tut, SAR mantığı Nexys A7 FPGA üzerinde; parçalar sipariş edildi
 
 ## 🏁 Literatürde neredeyiz?
 
@@ -125,6 +148,8 @@ Bizim sayılar **simülasyon** (sky130, 1,8 V, tt, 25 °C; komparatör sayılar�
 - [x] Rail-to-rail StrongARM komparatör: layout, DRC/LVS, Monte Carlo
 - [x] Olay tabanlı 10 bit SAR referans tasarımı: 36 pJ, boşta 24 nW
 - [x] CDAC, örnekleme anahtarları ve ortak mod referansı blok blok doğrulandı
+- [x] CDAC ve analog anahtar layout'ları (DRC temiz, RC çıkarımlı doğrulama)
+- [ ] Masaüstü demo: 8 bit R-2R SAR, Nexys A7 üzerinde
 - [ ] Tüm sistemi hiyerarşik şemada birleştirmek
 - [ ] FFT ile ENOB doğrulaması
 - [ ] Tam ADC layout'u ve FPGA (Nexys A7) üzerinde SAR mantığı denemesi
