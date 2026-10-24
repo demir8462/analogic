@@ -61,12 +61,13 @@ Kapasite dizisinin çıkışını referansla karşılaştırır, kararı verince
 
 | Metrik | Sonuç |
 |---|---|
-| Yapı | 9 bit ikili ağırlıklı dizi + dummy |
+| Yapı | 10 bit ikili ağırlıklı dizi + dummy halka (ilk sürüm 9 bit) |
 | Doğruluk | El ile sürülen SAR testinde doğru kod; en büyük hata **0,34 mV (< 0,1 LSB)** |
 | En kötü bit oturması | **24 ns** (0,25 LSB'ye) |
 | İyileştirme | Parazitik kaynaklı %1,4 kazanç hatası tespit edilip 10 kat düşürüldü |
 | Layout | 16×32 2D ortak merkezli dizi, 512 aktif + 100 dummy birim, **DRC 0** |
 | Layout (RC çıkarımlı) | Doğru kod; kazanç 0,984, **INL en kötü 0,07 LSB**, en kötü oturma **12 ns** |
+| 10 bit layout | 130,5×151 µm, **DRC 0, LVS eş**; RC çıkarımlı testte kod 17 doğru, en kötü oturma **7,0 ns**, kazanç 0,981, INL en kötü 0,56 LSB. **Açık konu:** DNL en kötü −0,82 LSB (511→512), sebebi hat–üst plaka paraziti, düzeltme üzerinde çalışılıyor |
 
 ### 🔌 Örnekleme ve analog anahtarlar
 Girişi kapasitelere alır, plakaları referanslara bağlar.
@@ -83,8 +84,9 @@ Karşılaştırma noktasını üretir; tamamen pasif ve çok düşük akımlı.
 | Metrik | Sonuç |
 |---|---|
 | Çıkış | **0,900 V** (VDD/2, beslemeyle oransal) |
-| Akım / güç | ~20 nA / ~36 nW |
-| Örnekleme anında çökme | sadece **20 µV** |
+| Akım / güç | ~20 nA / ~36 nW (zayıf kol) |
+| 10 bit örnekleme yükü | Güçlendirilmiş sürüm (zayıf kol + başlangıçta devreye giren güçlü kol); 100 ardışık örnekte **birikme yok**, örnek sonu VCM 0,84 / 0,96 V (tt) |
+| Layout | 24,7×49,9 µm, **DRC 0, LVS eş**, RC çıkarımlı sonuç şemayla aynı |
 
 ### 🧠 SAR mantığı ve sıralayıcı
 Bitleri yazar, komparatörü tetikler ve durdurur; saati kendisi üretir.
@@ -111,7 +113,9 @@ Bitleri yazar, komparatörü tetikler ve durdurur; saati kendisi üretir.
 | v1 | 42,6 ns | 5,2k / 15,8k / 2,2k Ω | DRC 0, LVS eş |
 | **v2 (LVT)** | **13,6 ns** | **1,6k / 2,4k / 1,2k Ω** | DRC 0, LVS eş |
 
-**📍 Ortak mod referansı:** köşelerde **0,900 V**, ~20 nA, boşta **36 nW** (25 °C)
+**🧮 CDAC 10 bit layout:** 130,5×151 µm, DRC 0, LVS eş; RC çıkarımlı testte kod 17 doğru, en kötü oturma **7,0 ns**. Açık konu: DNL −0,82 LSB, düzeltme sürüyor
+
+**📍 Ortak mod referansı (v3):** köşelerde **0,900 V**, boşta **36 nW** (25 °C); 10 bit yükle 100 örnekte birikme yok; layout 24,7×49,9 µm, DRC 0, LVS eş
 
 **🔧 Masaüstü demo (yolda):** 8 bit R-2R SAR + örnekle-tut, SAR mantığı Nexys A7 FPGA üzerinde; parçalar sipariş edildi
 
@@ -148,7 +152,9 @@ Bizim sayılar **simülasyon** (sky130, 1,8 V, tt, 25 °C; komparatör sayılar�
 - [x] Rail-to-rail StrongARM komparatör: layout, DRC/LVS, Monte Carlo
 - [x] Olay tabanlı 10 bit SAR referans tasarımı: 36 pJ, boşta 24 nW
 - [x] CDAC, örnekleme anahtarları ve ortak mod referansı blok blok doğrulandı
-- [x] CDAC ve analog anahtar layout'ları (DRC temiz, RC çıkarımlı doğrulama)
+- [x] CDAC (10 bit) ve analog anahtar layout'ları (DRC temiz, LVS eş, RC çıkarımlı doğrulama)
+- [x] Ortak mod referansı v3: layout, 10 bit yükle çok örnekli doğrulama
+- [ ] CDAC DNL iyileştirmesi (−0,82 LSB)
 - [ ] Masaüstü demo: 8 bit R-2R SAR, Nexys A7 üzerinde
 - [ ] Tüm sistemi hiyerarşik şemada birleştirmek
 - [ ] FFT ile ENOB doğrulaması
