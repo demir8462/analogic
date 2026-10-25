@@ -25,11 +25,21 @@
   <text x="60" y="333" fill="#64748b" font-size="13" letter-spacing="2">ASLEEP · 24 nW</text>
   <text x="216" y="262" fill="#22d3ee" font-size="12" letter-spacing="2">EVENT</text>
 
+  <!-- self-timed READY pulse train -->
+  <text x="610" y="70" fill="#64748b" font-size="12" letter-spacing="2">READY (self-clock)</text>
+  <path d="M610 112 H626 V84 H644 V112 H662 V84 H680 V112 H698 V84 H716 V112 H734 V84 H752 V112 H770 V84 H788 V112 H806 V84 H824 V112 H840"
+        fill="none" stroke="#22d3ee" stroke-width="2" stroke-linejoin="round"/>
+  <!-- CDAC residue converging, one bit per READY -->
+  <text x="610" y="146" fill="#64748b" font-size="12" letter-spacing="2">CDAC SETTLING</text>
+  <path d="M610 205 V160 H650 V190 H690 V172 H730 V184 H770 V177 H810 V181 H840"
+        fill="none" stroke="#22d3ee" stroke-opacity="0.7" stroke-width="2" stroke-linejoin="round"/>
+  <path d="M610 181 H840" stroke="#334155" stroke-width="1" stroke-dasharray="3 4"/>
+
   <!-- title -->
   <text x="60" y="110" fill="#ffffff" font-size="64" font-weight="800" letter-spacing="6">ANALOGIC</text>
   <rect x="62" y="124" width="84" height="4" rx="2" fill="#22d3ee"/>
   <text x="60" y="165" fill="#cbd5e1" font-size="24">Event-driven 10-bit SAR ADC in open-source sky130</text>
-  <text x="60" y="196" fill="#94a3b8" font-size="18">Sleeps at nanowatts. Wakes on an event. Clocks itself.</text>
+  <text x="60" y="196" fill="#94a3b8" font-size="18">Asynchronous, clockless. Sleeps at nanowatts.</text>
 
   <!-- stat chips -->
   <g font-size="14" fill="#e2e8f0">

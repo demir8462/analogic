@@ -29,8 +29,9 @@ This fits any application where the signal is mostly quiet: neural recording, vi
 |---|---|
 | **Energy per conversion** | **36 pJ**, about 13x lower than an open-source sky130 SAR from the literature |
 | **Idle power** | **24 nW** at 25 °C, 65 nW at 75 °C |
-| **Comparator** | Rail-to-rail input, **σ 1.6 – 2.8 mV** offset with no calibration, layout DRC/LVS clean |
+| **Comparator** | Asynchronous (self-timed, READY output), rail-to-rail input, **σ 1.6 – 2.8 mV** offset with no calibration, layout DRC/LVS clean |
 | **Accuracy** | 30 … 1770 mV input, across tt/ss/ff and 75 °C: **−1 … 0 LSB** |
+| **CDAC linearity** | Shielded 10-bit layout, RC-extracted: **DNL −0.20 LSB, INL 0.12 LSB**, DRC clean, LVS matched |
 | **Self-timed** | One START pulse, 10 bits resolved asynchronously in 123 ns |
 | **Smart modes** | Early stop (6 bit, 26 pJ) and single-decision window check (9.7 pJ) |
 | **Down to layout** | Comparator, capacitor DAC, switches and reference all drawn; DRC clean, LVS matched, post-layout RC verified |
@@ -53,7 +54,7 @@ This fits any application where the signal is mostly quiet: neural recording, vi
 <img src="img/comparator.svg" alt="Comparator v6b key numbers" width="100%">
 </div>
 
-The comparator is the heart of an event-driven SAR: it decides, and its own **READY** pulse is what clocks the whole conversion. So it had to work at any common-mode level and finish fast enough to drive an asynchronous loop.
+The comparator is the heart of an event-driven SAR, and it is **asynchronous**: there is no external clock. Once it has decided, it raises its own **READY** pulse, which re-arms it and clocks the next bit, so the conversion runs on a loop the comparator itself closes. It therefore had to work at any common-mode level and finish fast enough to drive that loop.
 
 Most StrongARM comparators only work near one common-mode voltage. Ours works across the **entire supply range**, from 30 mV to 1.79 V, in 1.8 V sky130.
 
@@ -86,8 +87,8 @@ Holds the sampled input and tries one bit per step: the SAR's balance.
 | Parasitic fix | A 1.4 % gain error from parasitics was found and cut by 10x |
 | Layout (9-bit) | 16 x 32 2D common-centroid array, 512 active + 100 dummy unit cells, **DRC 0** |
 | Layout, RC-extracted (9-bit) | Correct code, gain 0.984, **worst INL 0.07 LSB**, worst settling 12 ns |
-| Layout (10-bit) | 130.5 x 151 µm, **DRC 0, LVS matched**. RC-extracted: correct code 17, worst settling **7.0 ns**, gain 0.981, worst INL 0.56 LSB |
-| Open item | Worst DNL −0.82 LSB (511 → 512), caused by routing-to-top-plate parasitics; a fix is in progress |
+| **Layout (10-bit, shielded)** | 128.3 x 176.6 µm, **DRC 0, LVS matched**. Grounded metal shield between the bit lines and the top plate: **worst DNL −0.20 LSB, worst INL 0.12 LSB** (static weights, RC-extracted). RC-extracted: correct code 17 at all corners, worst 0.5 LSB settling **6.2 / 8.1 / 5.3 ns** (tt / ss 75 °C / ff) |
+| First 10-bit layout (unshielded) | 130.5 x 151 µm. Worst DNL −0.82 LSB (511 → 512), worst INL 0.56 LSB, caused by bit-line coupling to the top plate; the shield cut both by about 4x |
 
 ### Sampling and analog switches
 Takes the input onto the capacitors and ties the plates to the references.
@@ -161,7 +162,7 @@ Our numbers are **simulation** (sky130, 1.8 V, tt, 25 °C; comparator numbers fr
 - [x] CDAC, sampling switches and common-mode reference verified block by block
 - [x] CDAC (10-bit) and analog switch layouts: DRC clean, LVS matched, RC-extracted verification
 - [x] Common-mode reference v3: layout, multi-sample verification under 10-bit load
-- [ ] CDAC DNL improvement (−0.82 LSB)
+- [x] CDAC DNL/INL improvement by shielding: DNL −0.82 → −0.20 LSB, INL 0.56 → 0.12 LSB
 - [ ] Desktop demo: 8-bit R-2R SAR on a Nexys A7 FPGA
 - [ ] Assemble the whole system in a hierarchical schematic
 - [ ] ENOB verification by FFT
