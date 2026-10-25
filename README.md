@@ -7,7 +7,7 @@
 ![PDK](https://img.shields.io/badge/PDK-sky130A-0f172a?style=flat-square&labelColor=0f172a&color=22d3ee)
 ![ADC](https://img.shields.io/badge/SAR%20ADC-10%20bit%20%C2%B7%201%20MS%2Fs-0f172a?style=flat-square&labelColor=0f172a&color=22d3ee)
 ![Layout](https://img.shields.io/badge/layout-DRC%20%2F%20LVS%20clean-0f172a?style=flat-square&labelColor=0f172a&color=22d3ee)
-![Status](https://img.shields.io/badge/status-simulation%20%2B%20layout-0f172a?style=flat-square&labelColor=0f172a&color=64748b)
+![Status](https://img.shields.io/badge/analog%20core-in%20layout%2C%20RC%20verified-0f172a?style=flat-square&labelColor=0f172a&color=64748b)
 
 </div>
 
@@ -50,7 +50,7 @@ This fits any application where the signal is mostly quiet: neural recording, vi
 
 ## Full analog core in layout
 
-Every analog block is placed and wired in one layout: signal CDAC and its mirrored **replica CDAC**, bit drivers and input switches under each array, the common-mode generators across the top, and the asynchronous comparator in the middle column between the two arrays.
+Every analog block is placed and wired in one layout: signal CDAC, **replica CDAC**, bit drivers and input switches, common-mode generators and the asynchronous comparator. The whole core is then RC-extracted and run through real conversions.
 
 | | Result |
 |---|---|
@@ -108,8 +108,6 @@ Holds the sampled input and tries one bit per step: the SAR's balance.
 ### Sampling and analog switches
 Takes the input onto the capacitors and ties the plates to the references.
 
-| Metric | Result |
-|---|---|
 Bottom-plate sampling through per-bit input switches, top plate held at VCM. Two transmission-gate cells, both with layout DRC 0, LVS matched and layout = schematic:
 
 | Switch | Settling to 0.5 LSB (2 pF) | Peak Ron tt / ss / ff | Off leakage (worst) |
@@ -177,7 +175,7 @@ Our numbers are **simulation** (sky130, 1.8 V, tt, 25 °C; comparator numbers fr
 | Decision time | 2.4 – 4.1 ns (CLK → READY) | 63 – 136 ps |
 | Supply | 1.8 V | 1.2 V |
 
-**In short:** thanks to event-driven operation, idle power is about a thousand times lower than the others and energy per conversion is much lower. Competitor B is measured silicon; ours is simulation so far, with ENOB verification and full-system layout still ahead.
+**In short:** thanks to event-driven operation, idle power is about a thousand times lower than the others and energy per conversion is much lower. Competitor B is measured silicon; ours is simulation so far, with the full analog core already in layout and ENOB verification next.
 
 ---
 
@@ -188,10 +186,10 @@ Our numbers are **simulation** (sky130, 1.8 V, tt, 25 °C; comparator numbers fr
 - [x] CDAC, sampling switches and common-mode reference verified block by block
 - [x] CDAC (10-bit) and analog switch layouts: DRC clean, LVS matched, RC-extracted verification
 - [x] Common-mode reference v3: layout, multi-sample verification under 10-bit load
-- [x] CDAC DNL/INL improvement by shielding: DNL −0.82 → −0.20 LSB, INL 0.56 → 0.12 LSB
-- [x] Full analog core layout (CDAC + replica, drivers, VCM, comparator): DRC 0, LVS matched, RC-extracted conversions within −1 LSB
+- [x] Shielded 10-bit CDAC: DNL −0.20 LSB, INL 0.12 LSB (RC-extracted)
+- [x] Full analog core layout (CDAC + replica, drivers, VCM, comparator): DRC 0, LVS matched, RC-extracted conversions within 1 LSB
 - [x] Comparator with STOP input: layout DRC 0, LVS matched, extracted simulation
-- [ ] Stronger VCM branch to remove the last −1 LSB and shorten sampling
+- [ ] Faster sampling with a stronger VCM branch
 - [ ] SAR logic placed next to the analog core
 - [ ] Desktop demo: 8-bit R-2R SAR on a Nexys A7 FPGA
 - [ ] ENOB verification by FFT
