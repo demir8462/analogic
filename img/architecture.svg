@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 330" width="1280" height="330" font-family="'Segoe UI', Helvetica, Arial, sans-serif">
+  <defs>
+    <marker id="a" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0 0L10 5L0 10z" fill="#64748b"/></marker>
+    <marker id="b" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0 0L10 5L0 10z" fill="#f59e0b"/></marker>
+    <linearGradient id="star" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#3a2a0a"/><stop offset="1" stop-color="#1f1608"/></linearGradient>
+  </defs>
+  <rect width="1280" height="330" rx="18" fill="#0a0f1c"/>
+
+  <!-- blocks -->
+  <g font-size="16" fill="#e2e8f0" text-anchor="middle">
+    <rect x="40" y="110" width="150" height="80" rx="12" fill="#0f172a" stroke="#334155"/>
+    <text x="115" y="145" font-weight="600">Bootstrap</text><text x="115" y="167" fill="#94a3b8" font-size="13">sampling switch</text>
+
+    <rect x="260" y="110" width="170" height="80" rx="12" fill="#0f172a" stroke="#334155"/>
+    <text x="345" y="145" font-weight="600">CDAC</text><text x="345" y="167" fill="#94a3b8" font-size="13">10-bit, common-centroid</text>
+
+    <rect x="500" y="95" width="230" height="110" rx="14" fill="url(#star)" stroke="#f59e0b" stroke-width="2"/>
+    <text x="615" y="132" font-weight="700" fill="#fbbf24" font-size="13" letter-spacing="2">★ STAR</text>
+    <text x="615" y="158" font-weight="700" font-size="19">Comparator</text>
+    <text x="615" y="182" fill="#fcd34d" font-size="13">rail-to-rail · σ 1.6–2.8 mV</text>
+
+    <rect x="800" y="110" width="190" height="80" rx="12" fill="#0f172a" stroke="#334155"/>
+    <text x="895" y="145" font-weight="600">SAR logic</text><text x="895" y="167" fill="#94a3b8" font-size="13">event-gated sequencer</text>
+
+    <rect x="1060" y="110" width="180" height="80" rx="12" fill="#0f172a" stroke="#22d3ee"/>
+    <text x="1150" y="145" font-weight="600" fill="#22d3ee">10-bit code</text><text x="1150" y="167" fill="#94a3b8" font-size="13">36 pJ per conversion</text>
+  </g>
+
+  <!-- arrows -->
+  <g stroke="#64748b" stroke-width="2" fill="none" marker-end="url(#a)">
+    <path d="M190 150H258"/><path d="M430 150H498"/><path d="M730 150H798"/><path d="M990 150H1058"/>
+  </g>
+  <!-- READY loop -->
+  <path d="M895 110 V50 H615 V93" stroke="#f59e0b" stroke-width="2" fill="none" stroke-dasharray="6 5" marker-end="url(#b)"/>
+  <text x="755" y="42" fill="#fbbf24" font-size="13" text-anchor="middle" letter-spacing="1">READY → next bit (self-timed loop)</text>
+  <!-- DAC feedback -->
+  <path d="M895 190 V250 H345 V192" stroke="#64748b" stroke-width="2" fill="none" marker-end="url(#a)"/>
+  <text x="620" y="272" fill="#94a3b8" font-size="13" text-anchor="middle">bit trial</text>
+
+  <!-- vin and reference -->
+  <text x="115" y="95" fill="#94a3b8" font-size="13" text-anchor="middle">Vin</text>
+  <text x="615" y="305" fill="#64748b" font-size="13" text-anchor="middle">common-mode reference (VDD/2) holds the top plate at 0.9 V</text>
+</svg>

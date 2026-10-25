@@ -1,15 +1,13 @@
 <div align="center">
 
-# ANALOGIC
+<img src="img/banner.svg" alt="ANALOGIC: event-driven 10-bit SAR ADC in sky130" width="100%">
 
-### An event-driven 10-bit SAR ADC in open-source SkyWater sky130
-**Sleeps at nanowatts. Wakes on an event. 36 pJ per conversion.**
+<br>
 
-![PDK](https://img.shields.io/badge/PDK-SkyWater%20sky130A-6f42c1)
-![ADC](https://img.shields.io/badge/SAR%20ADC-10%20bit%20%C2%B7%201%20MS%2Fs-orange)
-![Energy](https://img.shields.io/badge/energy-36%20pJ%2Fconv-blue)
-![Idle](https://img.shields.io/badge/idle-24%20nW-2ea44f)
-![Comparator](https://img.shields.io/badge/comparator-rail--to--rail%20%C2%B7%20DRC%2FLVS%20clean-red)
+![PDK](https://img.shields.io/badge/PDK-sky130A-0f172a?style=flat-square&labelColor=0f172a&color=22d3ee)
+![ADC](https://img.shields.io/badge/SAR%20ADC-10%20bit%20%C2%B7%201%20MS%2Fs-0f172a?style=flat-square&labelColor=0f172a&color=22d3ee)
+![Layout](https://img.shields.io/badge/layout-DRC%20%2F%20LVS%20clean-0f172a?style=flat-square&labelColor=0f172a&color=22d3ee)
+![Status](https://img.shields.io/badge/status-simulation%20%2B%20layout-0f172a?style=flat-square&labelColor=0f172a&color=64748b)
 
 </div>
 
@@ -20,6 +18,10 @@
 A conventional ADC samples and burns power whether or not the signal does anything. ANALOGIC does not. It **sleeps until something happens**, wakes itself, runs the conversion on a **clock it generates itself**, then goes back to sleep. No clock tree, almost no idle power.
 
 This fits any application where the signal is mostly quiet: neural recording, vibration monitoring, event-based imaging, sensor nodes.
+
+<div align="center">
+<img src="img/architecture.svg" alt="ANALOGIC architecture" width="100%">
+</div>
 
 ## Highlights
 
@@ -46,6 +48,10 @@ This fits any application where the signal is mostly quiet: neural recording, vi
 ---
 
 ## ★ The star: a rail-to-rail StrongARM comparator
+
+<div align="center">
+<img src="img/comparator.svg" alt="Comparator v6b key numbers" width="100%">
+</div>
 
 The comparator is the heart of an event-driven SAR: it decides, and its own **READY** pulse is what clocks the whole conversion. So it had to work at any common-mode level and finish fast enough to drive an asynchronous loop.
 
