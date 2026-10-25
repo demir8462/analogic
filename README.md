@@ -34,7 +34,7 @@ This fits any application where the signal is mostly quiet: neural recording, vi
 | **CDAC linearity** | Shielded 10-bit layout, RC-extracted: **DNL −0.20 LSB, INL 0.12 LSB**, DRC clean, LVS matched |
 | **Self-timed** | One START pulse, 10 bits resolved asynchronously in 123 ns |
 | **Smart modes** | Early stop (6 bit, 26 pJ) and single-decision window check (9.7 pJ) |
-| **Down to layout** | Comparator, capacitor DAC, switches and reference all drawn; DRC clean, LVS matched, post-layout RC verified |
+| **Down to layout** | Full analog core (CDAC + replica, drivers, VCM, comparator) in one layout: **DRC 0, LVS matched**, RC-extracted conversions within 1 LSB |
 
 <div align="center">
 <img src="img/guc_olay_hizi.png" width="760" alt="Power vs event rate">
@@ -44,6 +44,23 @@ This fits any application where the signal is mostly quiet: neural recording, vi
 <div align="center">
 <img src="img/sar_donusum.png" width="760" alt="SAR conversion">
 <br><sub><b>Asynchronous 10-bit conversion:</b> every READY pulse resolves one bit</sub>
+</div>
+
+---
+
+## Full analog core in layout
+
+Every analog block is placed and wired in one layout: signal CDAC and its mirrored **replica CDAC**, bit drivers and input switches under each array, the common-mode generators across the top, and the asynchronous comparator in the middle column between the two arrays.
+
+| | Result |
+|---|---|
+| Physical verification | **DRC 0, LVS matched** for the complete core |
+| Power distribution | Dedicated m5/m4 supply grid down to the comparator and every bit driver |
+| Full RC-extracted conversion (tt, 25 °C) | Bottom, mid and top of the range: **within 1 LSB** of the ideal code |
+
+<div align="center">
+<img src="img/top_sar_conversion.png" width="760" alt="Full-core conversion waveform">
+<br><sub><b>One conversion on the extracted layout:</b> sampling (grey), then the comparator's own READY pulses step through the bits while the top plate converges</sub>
 </div>
 
 ---
@@ -68,6 +85,8 @@ Most StrongARM comparators only work near one common-mode voltage. Ours works ac
 | Physical | **DRC clean, LVS matched**, 25.7 x 58.4 µm |
 | Topology | StrongARM latch with a double-tail-style PMOS pre-stage and a 4/1 PMOS tail |
 
+**STOP version:** the SAR logic can freeze the self-timed loop cleanly, with no fight current. Layout DRC 0, LVS matched. On the RC-extracted layout (tt): during STOP, CLK stays below **0.58 mV** and the cell draws **5.4 µA**, and decisions before and after STOP are correct.
+
 **Why it matters:** the rail-to-rail range lets the ADC converge around mid-supply (0.9 V) while the input swings the full range, and the built-in READY output turns the comparator into its own clock generator.
 
 ---
@@ -81,28 +100,22 @@ Holds the sampled input and tries one bit per step: the SAR's balance.
 
 | Metric | Result |
 |---|---|
-| Structure | 10-bit binary-weighted array plus dummy ring (first version was 9-bit) |
-| Accuracy | Correct code in a manually driven SAR test; worst error **0.34 mV (< 0.1 LSB)** |
-| Worst-case bit settling (9-bit) | 24 ns to 0.25 LSB |
-| Parasitic fix | A 1.4 % gain error from parasitics was found and cut by 10x |
-| Layout (9-bit) | 16 x 32 2D common-centroid array, 512 active + 100 dummy unit cells, **DRC 0** |
-| Layout, RC-extracted (9-bit) | Correct code, gain 0.984, **worst INL 0.07 LSB**, worst settling 12 ns |
-| **Layout (10-bit, shielded)** | 128.3 x 176.6 µm, **DRC 0, LVS matched**. Grounded metal shield between the bit lines and the top plate: **worst DNL −0.20 LSB, worst INL 0.12 LSB** (static weights, RC-extracted). RC-extracted: correct code 17 at all corners, worst 0.5 LSB settling **6.2 / 8.1 / 5.3 ns** (tt / ss 75 °C / ff) |
-| First 10-bit layout (unshielded) | 130.5 x 151 µm. Worst DNL −0.82 LSB (511 → 512), worst INL 0.56 LSB, caused by bit-line coupling to the top plate; the shield cut both by about 4x |
+| Structure | 10-bit binary-weighted MIM array, 2D common-centroid, dummy ring, grounded shield between bit lines and top plate |
+| Linearity (RC-extracted) | **DNL −0.20 LSB, INL 0.12 LSB** worst case |
+| Bit settling to 0.5 LSB (RC-extracted) | **6.2 / 8.1 / 5.3 ns** (tt / ss 75 °C / ff), correct code at all corners |
+| Layout | 128.6 x 177.3 µm, **DRC 0** (Magic + KLayout), **LVS matched** |
 
 ### Sampling and analog switches
 Takes the input onto the capacitors and ties the plates to the references.
 
 | Metric | Result |
 |---|---|
-| Sampling switch | Bootstrapped: on-resistance independent of input voltage, rail-to-rail input |
-| Plate switch v1 | Settles to half an LSB at 10 bit into 2 pF in 43 ns; layout DRC/LVS clean, layout = schematic |
-| Plate switch v2 (low-threshold) | Settles in **13.6 ns** (3x faster), off-state leakage worst case **0.31 nA** |
+Bottom-plate sampling through per-bit input switches, top plate held at VCM. Two transmission-gate cells, both with layout DRC 0, LVS matched and layout = schematic:
 
-| Switch | Settling (2 pF) | Peak Ron tt / ss / ff | Layout |
+| Switch | Settling to 0.5 LSB (2 pF) | Peak Ron tt / ss / ff | Off leakage (worst) |
 |---|---|---|---|
-| v1 | 42.6 ns | 5.2k / 15.8k / 2.2k Ω | DRC 0, LVS matched |
-| **v2 (LVT)** | **13.6 ns** | **1.6k / 2.4k / 1.2k Ω** | DRC 0, LVS matched |
+| Standard-Vt | 42.6 ns | 5.2k / 15.8k / 2.2k Ω | |
+| **Low-Vt** | **13.6 ns** | **1.6k / 2.4k / 1.2k Ω** | **0.31 nA** (ff, 75 °C) |
 
 ### Common-mode reference (VDD/2)
 Sets the comparison point; passive and very low current.
@@ -111,7 +124,7 @@ Sets the comparison point; passive and very low current.
 |---|---|
 | Output | **0.900 V** (VDD/2, ratiometric to supply) |
 | Current / power | ~20 nA / ~36 nW (weak branch) |
-| 10-bit sampling load | Strengthened v3: weak branch plus a strong branch that engages at the start of sampling. **No accumulation over 100 consecutive samples**; end-of-sample VCM 0.84 / 0.96 V (tt) |
+| 10-bit sampling load | Always-on weak branch plus a strong branch that engages only during sampling. **No drift over 100 consecutive samples** |
 | Layout | 24.7 x 49.9 µm, **DRC 0, LVS matched**, RC-extracted result matches the schematic |
 
 ### SAR logic and sequencer
@@ -122,6 +135,19 @@ Writes the bits, triggers and stops the comparator, generates its own timing.
 | Conversion | 10 bit from one START pulse, **123 ns** |
 | Modes | Early stop (6 bit, 26 pJ), single-decision window check (9.7 pJ) |
 | Safety | Timeout protection, returns to sleep by itself when done |
+
+---
+
+## How it was verified
+
+Every block follows the same flow before it is used one level up:
+
+1. **Schematic simulation** (xschem + ngspice) at tt / ss / ff, 25 °C and 75 °C
+2. **Layout** in Magic, mostly script-generated so it can be rebuilt after a change
+3. **DRC** (Magic, plus KLayout for the CDAC and STOP comparator) and **LVS** (netgen)
+4. **Parasitic extraction** (R and C) and the same testbench re-run on the extracted netlist
+5. **Monte Carlo** where matching matters (comparator offset), with a small sample set
+6. **System test** on the full extracted core, with a connectivity check script that runs before every simulation
 
 ---
 
@@ -163,10 +189,12 @@ Our numbers are **simulation** (sky130, 1.8 V, tt, 25 °C; comparator numbers fr
 - [x] CDAC (10-bit) and analog switch layouts: DRC clean, LVS matched, RC-extracted verification
 - [x] Common-mode reference v3: layout, multi-sample verification under 10-bit load
 - [x] CDAC DNL/INL improvement by shielding: DNL −0.82 → −0.20 LSB, INL 0.56 → 0.12 LSB
+- [x] Full analog core layout (CDAC + replica, drivers, VCM, comparator): DRC 0, LVS matched, RC-extracted conversions within −1 LSB
+- [x] Comparator with STOP input: layout DRC 0, LVS matched, extracted simulation
+- [ ] Stronger VCM branch to remove the last −1 LSB and shorten sampling
+- [ ] SAR logic placed next to the analog core
 - [ ] Desktop demo: 8-bit R-2R SAR on a Nexys A7 FPGA
-- [ ] Assemble the whole system in a hierarchical schematic
 - [ ] ENOB verification by FFT
-- [ ] Full ADC layout
 - [ ] Pixel/channel-level event detection integration
 
 ## Tools
