@@ -56,11 +56,11 @@ This fits any application where the signal is mostly quiet: neural recording, vi
 
 The comparator is the heart of an event-driven SAR, and it is **asynchronous**: there is no external clock. Once it has decided, it raises its own **READY** pulse, which re-arms it and clocks the next bit, so the conversion runs on a loop the comparator itself closes. It therefore had to work at any common-mode level and finish fast enough to drive that loop.
 
-Most StrongARM comparators only work near one common-mode voltage. Ours works across the **entire supply range**, from 30 mV to 1.79 V, in 1.8 V sky130.
+Most StrongARM comparators only work near one common-mode voltage. Ours works across the **entire supply range**, and in fact extends **beyond both rails**. We characterized it from 30 mV to 1.79 V in 1.8 V sky130 and did not sweep further, so every number below is for that window.
 
 | Metric | Result |
 |---|---|
-| Input common mode | **Rail-to-rail: 30 … 1790 mV** |
+| Input common mode | **Rail-to-rail and beyond.** Characterized: 30 … 1790 mV (range was not swept past this window) |
 | Offset (extracted layout, Monte Carlo) | **σ 2.4 / 1.6 / 2.8 mV** at VCM 30 / 900 / 1790 mV, **no calibration** |
 | Decision time (CLK → READY) | **4.1 / 3.0 / 2.4 ns** at VCM 30 / 900 / 1790 mV |
 | Self-clocked loop (layout netlist, tt, 25 °C) | CLK → READY 3.7 / 2.9 / 2.3 ns, loop period 15.5 – 16.6 ns |
@@ -146,7 +146,7 @@ Our numbers are **simulation** (sky130, 1.8 V, tt, 25 °C; comparator numbers fr
 
 | | **ANALOGIC (v6b, layout + MC)** | C: StrongARM (45 nm, sim) |
 |---|---|---|
-| Input range | **Rail-to-rail** (VCM 30 … 1790 mV) | around a fixed VCM |
+| Input range | **Rail-to-rail and beyond** (characterized VCM 30 … 1790 mV) | around a fixed VCM |
 | Offset | **σ 1.6 – 2.8 mV** (Monte Carlo) | 28 mV |
 | Decision time | 2.4 – 4.1 ns (CLK → READY) | 63 – 136 ps |
 | Supply | 1.8 V | 1.2 V |
