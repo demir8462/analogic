@@ -6,11 +6,10 @@ The SAR algorithm, the sample-and-hold sequence and the board-level control are 
 
 ## The setup
 
-```
-  VIN ──► MCP6001 buffer ──► hold capacitor (10 nF) ──► MCP6561 comparator ◄── R-2R DAC (8 bit)
-                ▲  SH                                           │ CMP              ▲ SEL1…SEL8
-                └──────────── Nexys A7-100T (SAR controller, 7-segment, LEDs) ◄────┘
-```
+<div align="center">
+<img src="img/hw_block_diagram.png" width="100%" alt="FPGA and board block diagram">
+<br><sub><b>System:</b> the Nexys A7 runs the SAR state machine and drives the board through two Pmod headers; the board returns one comparator bit</sub>
+</div>
 
 | Block | Implementation |
 |---|---|
@@ -51,8 +50,23 @@ The controller is simulated against a behavioural model of the board, including 
 | Conversion time | 100 µs sampling + 8 × 20 µs bits ≈ 262 µs |
 
 <div align="center">
-<img src="img/hw_sim.png" width="900" alt="FPGA controller simulation">
-<br><sub><b>Controller + board model:</b> full transfer curve with no code errors, and one conversion stepping onto 2.222 V</sub>
+<img src="img/hw_tb_binary_search.png" width="100%" alt="One conversion in simulation">
+<br><sub><b>One conversion with real timing (Vivado xsim):</b> 100 µs sample, then 8 bit trials of 20 µs each; 2.222 V gives code 172 (0xAC). SH and comparator output below, comparator input at every decision on the right</sub>
+</div>
+
+<div align="center">
+<img src="img/hw_tb_waveform.png" width="100%" alt="Logic testbench waveform">
+<br><sub><b>Logic testbench in Vivado xsim:</b> one 262 µs conversion, 100 µs sample then 8 × 20 µs bit trials</sub>
+</div>
+
+<div align="center">
+<img src="img/hw_tb_transfer.png" width="100%" alt="Transfer sweep">
+<br><sub><b>Full transfer sweep:</b> 1101 input levels from 0 to 3.3 V, every code exact (same RTL, shortened timing for the sweep)</sub>
+</div>
+
+<div align="center">
+<img src="img/hw_vivado_summary.png" width="100%" alt="Vivado timing and utilization">
+<br><sub><b>Implementation on the Nexys A7-100T at 100 MHz:</b> all timing met, 188 LUTs; values from the Vivado timing and utilization reports</sub>
 </div>
 
 ## Bring-up
