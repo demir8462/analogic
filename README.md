@@ -7,7 +7,7 @@
 ![PDK](https://img.shields.io/badge/PDK-sky130A-0f172a?style=flat-square&labelColor=0f172a&color=22d3ee)
 ![ADC](https://img.shields.io/badge/SAR%20ADC-10%20bit%20%C2%B7%201%20MS%2Fs-0f172a?style=flat-square&labelColor=0f172a&color=22d3ee)
 ![Layout](https://img.shields.io/badge/layout-DRC%20%2F%20LVS%20clean-0f172a?style=flat-square&labelColor=0f172a&color=22d3ee)
-![Status](https://img.shields.io/badge/analog%20core-in%20layout%2C%20RC%20verified-0f172a?style=flat-square&labelColor=0f172a&color=64748b)
+![Status](https://img.shields.io/badge/full%20ADC-in%20layout%2C%20RC%20verified-0f172a?style=flat-square&labelColor=0f172a&color=64748b)
 
 </div>
 
@@ -34,7 +34,7 @@ This fits any application where the signal is mostly quiet: neural recording, vi
 | **CDAC linearity** | Shielded 10-bit layout, RC-extracted: **DNL −0.20 LSB, INL 0.12 LSB**, DRC clean, LVS matched |
 | **Self-timed** | One START pulse, 10 bits resolved asynchronously in 123 ns |
 | **Smart modes** | Early stop (6 bit, 26 pJ) and single-decision window check (9.7 pJ) |
-| **Down to layout** | Full analog core (CDAC + replica, drivers, VCM, comparator) in one layout: **DRC 0, LVS matched**, RC-extracted conversions within 1 LSB |
+| **Down to layout** | Complete ADC (analog core + SAR logic) in one layout: **DRC 0, LVS matched**, extracted conversions within 1 LSB at slow and fast corners, **1 MS/s at ss 75 °C** |
 
 <div align="center">
 <img src="img/guc_olay_hizi.png" width="760" alt="Power vs event rate">
@@ -48,19 +48,31 @@ This fits any application where the signal is mostly quiet: neural recording, vi
 
 ---
 
-## Full analog core in layout
+## The complete ADC, end to end
 
-Every analog block is placed and wired in one layout: signal CDAC, **replica CDAC**, bit drivers and input switches, common-mode generators and the asynchronous comparator. The whole core is then RC-extracted and run through real conversions.
+The whole converter is in one layout: signal CDAC, **replica CDAC**, bit drivers and input switches, common-mode generators, the asynchronous comparator **and the SAR logic**. It is RC-extracted and simulated at transistor level, from the START pulse to the final code.
 
 | | Result |
 |---|---|
-| Physical verification | **DRC 0, LVS matched** for the complete core |
-| Power distribution | Dedicated m5/m4 supply grid down to the comparator and every bit driver |
-| Full RC-extracted conversion (tt, 25 °C) | Bottom, mid and top of the range: **within 1 LSB** of the ideal code |
+| Physical verification | **DRC 0, LVS matched** for the complete ADC |
+| Full conversion, extracted parasitics | Bottom, mid and top of the range at **slow 75 °C** and **fast 25 °C**: every code **within 1 LSB** |
+| Speed, worst corner (ss, 75 °C) | 500 ns sampling + **284–288 ns** conversion = **788 ns** → **1 MS/s** holds at the slow corner |
+| Speed, fast corner (ff, 25 °C) | **147–149 ns** conversion |
+| Sampling accuracy | Top plate settles within **0.15 mV** by the end of sampling |
 
 <div align="center">
-<img src="img/top_sar_conversion.png" width="760" alt="Full-core conversion waveform">
-<br><sub><b>One conversion on the extracted layout:</b> sampling (grey), then the comparator's own READY pulses step through the bits while the top plate converges</sub>
+<img src="img/adc_full_cycle.png" width="900" alt="Full ADC cycle from START">
+<br><sub><b>One full cycle from START (ss, 75 °C):</b> the input is sampled on the DAC bottom plates while START is high, then the comparator's own READY pulses walk through the 10 bits. Code 512, as expected</sub>
+</div>
+
+<div align="center">
+<img src="img/adc_binary_search.png" width="900" alt="SAR binary search">
+<br><sub><b>The binary search, bit by bit:</b> DAC trial level against the input, with the comparator input at every decision</sub>
+</div>
+
+<div align="center">
+<img src="img/adc_corners.png" width="900" alt="Corner results">
+<br><sub><b>Corner results</b> on the extracted layout</sub>
 </div>
 
 ---
@@ -145,7 +157,7 @@ Every block follows the same flow before it is used one level up:
 3. **DRC** (Magic, plus KLayout for the CDAC and STOP comparator) and **LVS** (netgen)
 4. **Parasitic extraction** (R and C) and the same testbench re-run on the extracted netlist
 5. **Monte Carlo** where matching matters (comparator offset), with a small sample set
-6. **System test** on the full extracted core, with a connectivity check script that runs before every simulation
+6. **System test** on the complete extracted ADC at slow and fast corners, with a connectivity check script that runs before every simulation
 
 ---
 
@@ -175,7 +187,7 @@ Our numbers are **simulation** (sky130, 1.8 V, tt, 25 °C; comparator numbers fr
 | Decision time | 2.4 – 4.1 ns (CLK → READY) | 63 – 136 ps |
 | Supply | 1.8 V | 1.2 V |
 
-**In short:** thanks to event-driven operation, idle power is about a thousand times lower than the others and energy per conversion is much lower. Competitor B is measured silicon; ours is simulation so far, with the full analog core already in layout and ENOB verification next.
+**In short:** thanks to event-driven operation, idle power is about a thousand times lower than the others and energy per conversion is much lower. Competitor B is measured silicon; ours is simulation so far, with the complete ADC already in layout and ENOB verification next.
 
 ---
 
@@ -187,10 +199,10 @@ Our numbers are **simulation** (sky130, 1.8 V, tt, 25 °C; comparator numbers fr
 - [x] CDAC (10-bit) and analog switch layouts: DRC clean, LVS matched, RC-extracted verification
 - [x] Common-mode reference v3: layout, multi-sample verification under 10-bit load
 - [x] Shielded 10-bit CDAC: DNL −0.20 LSB, INL 0.12 LSB (RC-extracted)
-- [x] Full analog core layout (CDAC + replica, drivers, VCM, comparator): DRC 0, LVS matched, RC-extracted conversions within 1 LSB
+- [x] Full analog core layout (CDAC + replica, drivers, VCM, comparator): DRC 0, LVS matched
 - [x] Comparator with STOP input: layout DRC 0, LVS matched, extracted simulation
-- [ ] Faster sampling with a stronger VCM branch
-- [ ] SAR logic placed next to the analog core
+- [x] SAR logic placed with the analog core: complete ADC DRC 0, LVS matched
+- [x] Transistor-level conversions on the extracted ADC: within 1 LSB, 1 MS/s at ss 75 °C
 - [ ] Desktop demo: 8-bit R-2R SAR on a Nexys A7 FPGA
 - [ ] ENOB verification by FFT
 - [ ] Pixel/channel-level event detection integration
