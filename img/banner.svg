@@ -22,7 +22,7 @@
   <g fill="#22d3ee">
     <circle cx="200" cy="250" r="4"/><circle cx="451" cy="235" r="4"/><circle cx="780" cy="255" r="4"/><circle cx="580" cy="240" r="4"/>
   </g>
-  <text x="60" y="333" fill="#64748b" font-size="13" letter-spacing="2">ASLEEP · 24 nW</text>
+  <text x="60" y="333" fill="#64748b" font-size="13" letter-spacing="2">ASLEEP</text>
   <text x="216" y="262" fill="#22d3ee" font-size="12" letter-spacing="2">EVENT</text>
 
   <g transform="translate(50,0)">
@@ -40,24 +40,24 @@
   <text x="60" y="110" fill="#ffffff" font-size="64" font-weight="800" letter-spacing="6">ANALOGIC</text>
   <rect x="62" y="124" width="84" height="4" rx="2" fill="#22d3ee"/>
   <text x="60" y="165" fill="#cbd5e1" font-size="24">Event-driven 10-bit SAR ADC in open-source sky130</text>
-  <text x="60" y="196" fill="#94a3b8" font-size="18">Asynchronous, clockless. Sleeps at nanowatts.</text>
+  <text x="60" y="196" fill="#94a3b8" font-size="18">Asynchronous and clockless, verified on the extracted layout.</text>
 
   <!-- stat chips -->
   <g font-size="14" fill="#e2e8f0">
     <g transform="translate(900,60)">
       <rect width="320" height="62" rx="12" fill="#0f172a" stroke="#22d3ee" stroke-opacity="0.45"/>
-      <text x="20" y="40" font-size="30" font-weight="700" fill="#22d3ee">36 pJ</text>
-      <text x="130" y="38" fill="#94a3b8">per conversion</text>
+      <text x="20" y="40" font-size="30" font-weight="700" fill="#22d3ee">1 MS/s</text>
+      <text x="150" y="38" fill="#94a3b8">all corners, post-layout</text>
     </g>
     <g transform="translate(900,134)">
       <rect width="320" height="62" rx="12" fill="#0f172a" stroke="#22d3ee" stroke-opacity="0.45"/>
-      <text x="20" y="40" font-size="30" font-weight="700" fill="#22d3ee">24 nW</text>
-      <text x="130" y="38" fill="#94a3b8">idle power, 25 °C</text>
+      <text x="20" y="40" font-size="30" font-weight="700" fill="#22d3ee">1 LSB</text>
+      <text x="150" y="38" fill="#94a3b8">max error, extracted</text>
     </g>
     <g transform="translate(900,208)">
       <rect width="320" height="62" rx="12" fill="#0f172a" stroke="#22d3ee" stroke-opacity="0.45"/>
-      <text x="20" y="40" font-size="30" font-weight="700" fill="#22d3ee">123 ns</text>
-      <text x="130" y="38" fill="#94a3b8">self-clocked, 10 bit</text>
+      <text x="20" y="40" font-size="30" font-weight="700" fill="#22d3ee">191 ns</text>
+      <text x="150" y="38" fill="#94a3b8">10-bit conversion</text>
     </g>
   </g>
 </svg>

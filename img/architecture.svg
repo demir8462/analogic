@@ -9,7 +9,7 @@
   <!-- blocks -->
   <g font-size="16" fill="#e2e8f0" text-anchor="middle">
     <rect x="40" y="110" width="150" height="80" rx="12" fill="#0f172a" stroke="#334155"/>
-    <text x="115" y="145" font-weight="600">Bootstrap</text><text x="115" y="167" fill="#94a3b8" font-size="13">sampling switch</text>
+    <text x="115" y="145" font-weight="600">Input switches</text><text x="115" y="167" fill="#94a3b8" font-size="13">bottom-plate sampling</text>
 
     <rect x="260" y="110" width="170" height="80" rx="12" fill="#0f172a" stroke="#334155"/>
     <text x="345" y="145" font-weight="600">CDAC</text><text x="345" y="167" fill="#94a3b8" font-size="13">10-bit, common-centroid</text>
@@ -23,7 +23,7 @@
     <text x="895" y="145" font-weight="600">SAR logic</text><text x="895" y="167" fill="#94a3b8" font-size="13">event-gated sequencer</text>
 
     <rect x="1060" y="110" width="180" height="80" rx="12" fill="#0f172a" stroke="#22d3ee"/>
-    <text x="1150" y="145" font-weight="600" fill="#22d3ee">10-bit code</text><text x="1150" y="167" fill="#94a3b8" font-size="13">36 pJ per conversion</text>
+    <text x="1150" y="145" font-weight="600" fill="#22d3ee">10-bit code</text><text x="1150" y="167" fill="#94a3b8" font-size="13">≤ 1 LSB post-layout</text>
   </g>
 
   <!-- arrows -->
